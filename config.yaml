@@ -1,0 +1,64 @@
+samples: samples.tsv
+RNASeqFileList: RNASeqFileList.tsv
+
+# Temporary files will be prefixed with path/to/scratch/. Leave as empty string to use default snakemake working directory
+temp_files_prefix: /scratch/midway2/bjf79/TestResultsScratch/
+
+ref:
+  genome: /home/bjf79/myhome_gilad_rcc/genomes/Pan_tro_3.0_Ensembl/Sequence/DNA/Pan_troglodytes.Pan_tro_3.0.dna_sm.chromosome.fa
+  fai: /home/bjf79/myhome_gilad_rcc/genomes/Pan_tro_3.0_Ensembl/Sequence/DNA/Pan_troglodytes.Pan_tro_3.0.dna_sm.chromosome.fa.fai
+
+  genomegtf: /home/bjf79/myhome_gilad_rcc/genomes/Pan_tro_3.0_Ensembl/GeneAnnotation/Pan_troglodytes.Pan_tro_3.0.94.chr.gtf
+  #gtf must be unzipped. Will be used to make a STAR index, if snakemake does
+  #not see one is already made.
+
+  STAR_index_folder: /project2/gilad/bjf79_project1/projects/Comparative_eQTL/code/snakemake_workflow/MiscOutput/STAR_index/
+  # Note that if you already made your own STAR index, there may be
+  # compatability issues based on the STAR version. If you want to use my
+  # index, leave as is.
+
+RNASeqMapping:
+    PathTo_STAR_alignment_Results: /project2/gilad/bjf79_project1/projects/Comparative_eQTL/code/snakemake_workflow/RNASeq/STAR/
+    # If you want to use my alignments leave as is. If you want to realign,
+    # define a new folder path to store the results
+
+sQTL_mapping:
+    vcf: /project2/gilad/bjf79_project1/projects/Comparative_eQTL/code/snakemake_workflow/PopulationSubstructure/ReferencePanelMerged.annotated.vcf.gz
+    #This vcf will be used to calculate a genetic relatedness matrix and
+    #genotype matrix used in QTL mapping. If you use the vcf I filled in here,
+    #note that the alleles may be recoded in the output files since I use plink
+    #(which I believe always codes always codes the minor allele as 0
+    #regardless of the reference allele) to convert vcf to plink files and do
+    #some genotype filtering and obtain a genotype matrix. Conversely, the snp
+    #names  will remain constant and follow this convention (I called these
+    #snps myself and had the freedom to name snps however I want):
+    #ID.chromosome.position.ref.alt
+    #So in other words, be wary if knowing the actual genotype is important to
+    #you once you have called QTLs. There is probably an option to fix this in
+    #plink but I haven't bothered to fix it.
+
+    sample_exclude_list: data/Remove.txt
+    # list of samples to exclude. Probably want to leave as is.
+    keep_fam_list: data/KeepFam.txt
+    # plink "families" (using my vcf this means chimp subspecies) to keep for
+    # analysis. Probably want to leave as is
+    family_name_to_remove: Pan_troglodytes_ThisStudy-
+    #When making the genotype table (MakeMatrixEQTL_snp_table rule), the plink
+    #family name to remove. Probably want to leave as is.
+
+    maf_filter: 0.1
+
+    chromosome_blacklist: data/chromsomseblacklist.txt
+    #list of chromosome to ignore for splicing phenotypes
+    
+    cis_window: 100000
+
+    RNASeqPC_min: 0
+    RNASeqPC_max: 13
+    # Test sQTL mapping with variable number of PCs
+
+    IdealNumberPC: 10
+    # and do real mapping with this number. Then output all nominal P-values
+    # and run eigenMT for intron level P-values
+
+
