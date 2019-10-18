@@ -18,8 +18,11 @@ This pipeline includes read mapping (STAR), preparation of a phenotype table of 
 If you simply want to use this workflow, clone the [latest release](https://github.com/bfairkun/sQTL_pipeline).
 If you intend to modify and further develop this workflow, fork this repository. Please consider providing any generally applicable modifications via a pull request.
 
-Install dependencies with conda:
+#### Install dependencies with conda:
+
 `conda env create --file environment.yaml`
+
+#### Other dependencies:
 
 Other dependencies that I could not include on conda include the scripts for leafcutter and eigenMT. For each of these I have my own fork with small modifications that are required for this pipeline to work:
 
@@ -27,7 +30,7 @@ Other dependencies that I could not include on conda include the scripts for lea
 
 [leafcutter](https://github.com/bfairkun/leafcutter): modified script to allow nonconventional chromosome names (eg: 2A)
 
-Add the necessary scripts to $PATH by appending the following to .bashrc:
+Clone my forks linked above, and add the necessary scripts to $PATH by appending the following to .bashrc:
 ```
 export PATH=$PATH:PathToLeacutterClonedRepo/scripts
 export PATH=$PATH:PathToLeacutterClonedRepo/clustering
