@@ -53,12 +53,47 @@ sQTL_mapping:
     
     cis_window: 100000
 
-    RNASeqPC_min: 0
+    RNASeqPC_min: 1
     RNASeqPC_max: 13
     # Test sQTL mapping with variable number of PCs
 
     IdealNumberPC: 10
     # and do real mapping with this number. Then output all nominal P-values
-    # and run eigenMT for intron level P-values
+    # and run eigenMT for intron level P-values. This is what I did for eGene
+    # mapping with chimp data but it might not be totally appropriate for
+    # sQTLs, for two reasons: (1) Depending on the downstream analysis you are
+    # interested in, you might be biologically interested in gene level
+    # P-values rather than intron level P-values, so the multiple hypothesis
+    # correction after testing all introns might be unnecessarily conservative.
+    # And (2) Intron level splicing phenotypes are not independent. For
+    # example, an increase in exon skipping means an increase in the skipped
+    # junction and a necessarily accompanying decrease in the junctions of the
+    # flanking introns. Maybe it is best to consider all of those phenotypes as
+    # a distinct entity. Perhaps it is better to obtain leafcutter cluster
+    # level P-values. For both of those reasons, it might be better to come up
+    # with your own method for multiple testing correction based on
+    # permutations. I have an Rscript for doing these permutations to get you
+    # started, but you will have to modify it based on your needs. For example,
+    # you could try to re-implement the method GTEx which (as I understand it)
+    # involves permutation testing where the best intron:snp P-value is saved
+    # for each gene by grouping introns as belonging to a particular gene (or
+    # cluster if that is what you desire).
+ 
+    # permutation test similar to gtex method for eGenes. Save best P-value for
+    # each intron phenotype after each permutation of the sample labels. At the
+    # end, compare the best P-value for each phenotype to the null distribution
+    # of P-values obtained by permutations. To obtain cluster level or gene
+    # level P-values, you will have to edit these scripts to output best
+    # P-value among a group of phenotypes (grouped by either cluster or gene)
+    # rather than best P-value for each phenotype:
+    #
+    # scripts/MatrixEqtl_Cis_Permutations.R
+    # scripts/MatrixEqtl_Cis.AllPvals.R
+    #
+    # To increase parralellization, run the permutations as many independent
+    # jobs, with this many jobs and this many permutations per job. The total
+    # number of permutations is the product of these numbers
+    NumberPermutationChunks: 10
+    PermutationChunkSize: 2
 
 

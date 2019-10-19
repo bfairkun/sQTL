@@ -26,11 +26,13 @@ rule filter_plink_file_for_testing:
     log:
         "logs/eQTL_mapping/filter_plink_file_for_testing.log"
     params:
-        stdparams = "--keep-fam {config[sQTL_mapping][keep_fam_list]}",
-        extra = '--remove {config[sQTL_mapping][sample_exclude_list]} --maf {config[sQTL_mapping][maf_filter]} --geno --hwe 1e-7.5'
+        keepfam = "--keep-fam " + config["sQTL_mapping"]["keep_fam_list"],
+        maf = "--maf " + str(config["sQTL_mapping"]["maf_filter"]),
+        remove_ind = "--remove " + config["sQTL_mapping"]["sample_exclude_list"],
+        extra = '--geno --hwe 1e-7.5'
     shell:
         """
-        plink --bfile eQTL_mapping/plink/Unfiltered  --allow-extra-chr --memory 28000 --make-bed --out eQTL_mapping/plink/ForAssociationTesting {params.stdparams} {params.extra} &> {log}
+        plink --bfile eQTL_mapping/plink/Unfiltered  --allow-extra-chr --memory 28000 --make-bed --out eQTL_mapping/plink/ForAssociationTesting {params.keepfam} {params.extra} {params.remove_ind} {params.maf} &> {log}
         """
 
 rule make_plink_file_for_GRM:
@@ -41,11 +43,13 @@ rule make_plink_file_for_GRM:
         bed = "eQTL_mapping/Kinship/ForGRM.bed",
         fam = "eQTL_mapping/Kinship/ForGRM.fam"
     params:
-        stdparams = "--keep-fam {config[sQTL_mapping][keep_fam_list]}",
-        extra = '--remove {config[sQTL_mapping][sample_exclude_list]} --maf 0.05 --geno --hwe 1e-7.5'
+        keepfam = "--keep-fam " + config["sQTL_mapping"]["keep_fam_list"],
+        maf = "--maf 0.05",
+        remove_ind = "--remove " + config["sQTL_mapping"]["sample_exclude_list"],
+        extra = '--geno --hwe 1e-7.5'
     shell:
         """
-        plink --bfile eQTL_mapping/plink/Unfiltered  --allow-extra-chr --make-bed --out eQTL_mapping/Kinship/ForGRM {params.stdparams} {params.extra}
+        plink --bfile eQTL_mapping/plink/Unfiltered  --allow-extra-chr --make-bed --out eQTL_mapping/Kinship/ForGRM {params.keepfam} {params.maf} {params.remove_ind} {params.extra}
         sed -i 's/-9$/1/' {output.fam}
         """
 

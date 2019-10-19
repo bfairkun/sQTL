@@ -135,7 +135,7 @@ rule MatrixEQTL_BestModelFromConfigFullResults:
         snp_locs = "eQTL_mapping/MatrixEQTL/ForAssociationTesting.snploc",
         phenotypes = "sQTL_mapping/MatrixEQTL/sQTL_phenoTable.Reordered.txt",
         gene_loc = "sQTL_mapping/MatrixEQTL/sQTL_intron.locs",
-        covariates = "sQTL_mapping/MatrixEQTL/Results/Results.PCs.{B}.covariates.txt".format(B=config["sQTL_mapping"]["IdealNumberPC"]),
+        covariates = "sQTL_mapping/Covariates/FromLeafcutter.PCs.{B}.covariates.txt".format(B=config["sQTL_mapping"]["IdealNumberPC"]),
         GRM = "eQTL_mapping/Kinship/GRM.cXX.txt",
     output:
         results = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Results.txt",
@@ -194,10 +194,48 @@ rule catEiginMT:
     input:
         expand("sQTL_mapping/MatrixEQTL/eigenMT/{chromosome}/results.txt", chromosome=set(contigs) - set(blacklist_contigs)),
     output:
-        "../../output/ChimpEgenes.eigenMT.txt.gz"
+        "sQTL_mapping/Chimp.eigenMT.txt.gz",
     log:
         "logs/eQTL_mapping/catEiginMT.log"
     shell:
         """
         (cat <(cat {input} | head -1) <(cat {input} | grep -v '^snps') | gzip - > {output}) &> {log}
         """
+
+rule sQTL_permutations:
+    input:
+        snps = "eQTL_mapping/MatrixEQTL/ForAssociationTesting.snps",
+        snp_locs = "eQTL_mapping/MatrixEQTL/ForAssociationTesting.snploc",
+        phenotypes = "sQTL_mapping/MatrixEQTL/sQTL_phenoTable.Reordered.txt",
+        gene_loc = "sQTL_mapping/MatrixEQTL/sQTL_intron.locs",
+        covariates = "sQTL_mapping/Covariates/FromLeafcutter.PCs.{B}.covariates.txt".format(B=config["sQTL_mapping"]["IdealNumberPC"]),
+        GRM = "eQTL_mapping/Kinship/GRM.cXX.txt",
+    output:
+        results = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.{n}.txt",
+    params:
+        InitialSeed = lambda wildcards: int(wildcards.n) * int(config["sQTL_mapping"]["PermutationChunkSize"]),
+        NumberPermutations = config["sQTL_mapping"]["PermutationChunkSize"],
+        cis_window = config["sQTL_mapping"]["cis_window"]
+    log:
+        "logs/sQTL_mapping/MatrixEQTL/Permutations/Chunk.{n}.log"
+    shell:
+        """
+        Rscript scripts/MatrixEqtl_Cis_Permutations.R {input.snps} {input.snp_locs} {input.phenotypes} {input.gene_loc} {input.covariates} {input.GRM} {output.results} {params.NumberPermutations} {params.InitialSeed} {params.cis_window} > {log}
+        """
+
+LastChunk=int(config["sQTL_mapping"]["NumberPermutationChunks"])-1
+rule MergePermutationChunks:
+    input:
+        Chunks = expand("sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.{n}.txt", n=range(0, int(config["sQTL_mapping"]["NumberPermutationChunks"])))
+    output:
+        "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/PermutationsCombined.txt"
+    log:
+        "sQTL_mapping/MergePermutationChunks.log"
+    shell:
+        """
+        cat eQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.0.txt > {output}
+        for i in {{1..{LastChunk}}}; do
+            tail -n +2 eQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.${{i}}.txt >> {output}
+        done
+        """
+
