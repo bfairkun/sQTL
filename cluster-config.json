@@ -110,6 +110,9 @@
   "STAR_alignment_PowerAnalysis":
   {"partition" : "broadwl", "mem": 58000, "tasks-per-node" : 10},
 
+  "sQTL_permutations":
+  {"mem" : 24000},
+
   "MatrixEQTL_BestModelFromConfigFullResults":
   {"mem" : 24000}
 

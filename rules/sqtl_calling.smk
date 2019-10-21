@@ -147,7 +147,7 @@ rule MatrixEQTL_BestModelFromConfigFullResults:
         cis_window = config["sQTL_mapping"]["cis_window"]
     shell:
         """
-        Rscript scripts/MatrixEqtl_Cis.AllPvals.R {input.snps} {input.snp_locs} {input.phenotypes} {input.gene_loc} {input.covariates} {input.GRM} {output.results} {output.fig} {params.cis_window} &> {log}
+        Rscript scripts/MatrixEqtl_Cis.AllPvals.R {input.snps} {input.snp_locs} {input.phenotypes} {input.gene_loc} {input.covariates} {input.GRM} {output.results} {output.fig} {params.cis_window} {output.BestGenePvals} &> {log}
         """
 
 rule splitForEigenMT:
@@ -169,11 +169,14 @@ rule splitForEigenMT:
         """
 
 rule EigenMT:
-    # depending on the python executable is pointed to by env (in the shebang
-    # line in eigenMT) it might be necessary to install some extra things. Or
-    # maybe you can try making a separate conda environment for running eigenMT
-    # and using the snakemake conda directive. (I included an environment in
-    # this repo but no guarantees that it works out of the box)
+    # EigenMT is an alternative to permutation testing to get phenotype-level
+    # P-values. I used it for identifying eGenes. However I think it was a bit
+    # buggy. I had to edit the source code which you can fork from my github.
+    # Also, depending on the python executable is pointed to by env (in the
+    # shebang line in eigenMT) it might be necessary to install some extra
+    # things. Or maybe you can try making a separate conda environment for
+    # running eigenMT and using the snakemake conda directive. (I included an
+    # environment in this repo but no guarantees that it works out of the box)
     input:
         snps = "sQTL_mapping/MatrixEQTL/eigenMT/{chromosome}/gen.txt",
         snp_locs =  "sQTL_mapping/MatrixEQTL/eigenMT/{chromosome}/gen.positions.txt",
@@ -183,8 +186,8 @@ rule EigenMT:
         "sQTL_mapping/MatrixEQTL/eigenMT/{chromosome}/results.txt"
     log:
         "logs/eQTL_mapping/EigenMT/{chromosome}.log"
-    # conda:
-    #     "../envs/eigenMT.yaml"
+    conda:
+        "../envs/eigenMT.yaml"
     shell:
         """
         eigenMT.py --QTL {input.results} --GEN {input.snps} --GENPOS {input.snp_locs} --PHEPOS {input.gene_loc} --cis_dist 250000 --OUT {output} --CHROM {wildcards.chromosome} &> {log}
@@ -233,9 +236,9 @@ rule MergePermutationChunks:
         "sQTL_mapping/MergePermutationChunks.log"
     shell:
         """
-        cat eQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.0.txt > {output}
+        cat sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.0.txt > {output}
         for i in {{1..{LastChunk}}}; do
-            tail -n +2 eQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.${{i}}.txt >> {output}
+            tail -n +2 sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.${{i}}.txt >> {output}
         done
         """
 

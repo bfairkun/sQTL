@@ -18,6 +18,7 @@ errorCovariance_file <- args[6]
 output_file_name_cis <- args[7]
 ouput_QQ <- args[8]
 cisDistance <- args[9]
+output_best_p <- args[10]
 
 # SNP_file_name <- "~/CurrentProjects/Comparative_eQTL/code/snakemake_workflow/scratch/Test.snps"
 # snps_location_file_name <- "~/CurrentProjects/Comparative_eQTL/code/snakemake_workflow/scratch/Test.snploc"
@@ -106,7 +107,7 @@ me = Matrix_eQTL_main(
   genepos = genepos,
   cisDist = cisDist,
   pvalue.hist = "qqplot",
-  min.pv.by.genesnp = FALSE,
+  min.pv.by.genesnp = TRUE,
   noFDRsaveMemory = FALSE);
 print('done with real pass')
 
@@ -126,5 +127,9 @@ cat('Analysis done in: ', me$time.in.sec, ' seconds', '\n');
 
 ggsave(file=ouput_QQ, plot(me))
 
+## Write out best p-value for each phenotype.
+me$cis$min.pv.gene %>% as.data.frame() %>%
+    rownames_to_column() %>%
+write.table(file=output_best_p, sep='\t', quote=F, col.names=c("Gene", "MinP"), row.names = FALSE)
 
 

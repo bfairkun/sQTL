@@ -21,9 +21,7 @@ If you intend to modify and further develop this workflow, fork this repository.
 Install dependencies with conda:
 `conda env create --file environment.yaml`
 
-Other dependencies that I could not include on conda include the scripts for leafcutter and eigenMT. For each of these I have my own fork with small modifications that are required for this pipeline to work:
-
-[eigenMT](https://github.com/bfairkun/eigenMT): fixed a bug that I think is dependent on the version of numpy or python used.
+Other dependencies that I could not include on conda include the scripts for leafcutter . I have my own fork with small modifications that are required for this pipeline to work:
 
 [leafcutter](https://github.com/bfairkun/leafcutter): modified script to allow nonconventional chromosome names (eg: 2A)
 
@@ -31,7 +29,6 @@ Add the necessary scripts to $PATH by appending the following to .bashrc:
 ```
 export PATH=$PATH:PathToLeacutterClonedRepo/scripts
 export PATH=$PATH:PathToLeacutterClonedRepo/clustering
-export PATH=$PATH:PathToEigenMTClonedRepo
 ```
 
 re-source the .bashrc:
@@ -39,8 +36,11 @@ re-source the .bashrc:
 
 Make sure tidyverse and MatrixEQTL are installed for R... I have been using RCC's R/3.4.3 (`module load R/3.4.3`), and installed these with `install.packages()` once in R.
 
-finally, activate the conda environment:
+activate the conda environment:
 `conda activate my_Chimp_EQTL_env` 
+
+and create rule-specic environments:
+`snakemake --use-conda --create-envs-only`
 
 ### Step 2: Configure workflow
 

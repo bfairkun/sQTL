@@ -20,8 +20,8 @@ InitialSeed <- as.numeric(args[9])
 cisDistance <- args[10]
 
 # setwd("/project2/gilad/bjf79_project1/projects/Comparative_eQTL/")
-# SNP_file_name <- "code/snakemake_workflow/scratch/Test.snps"
-# snps_location_file_name <- "code/snakemake_workflow/scratch/Test.snploc"
+# SNP_file_name <- "~/CurrentProjects/Comparative_eQTL/code/snakemake_workflow/scratch/Test.snps"
+# snps_location_file_name <- "~/CurrentProjects/Comparative_eQTL/code/snakemake_workflow/scratch/Test.snploc"
 # expression_file_name <- "code/snakemake_workflow/eQTL_mapping/MatrixEQTL/ForAssociationTesting.phenotypes.txt"
 # gene_location_file_name <- "code/snakemake_workflow/eQTL_mapping/MatrixEQTL/ForAssociationTesting.geneloc.txt"
 # covariates_file_name <- "output/Covariates/0GenotypePCs_and_11RNASeqPCs.covariates"
@@ -90,7 +90,7 @@ genepos = read.table(gene_location_file_name, header = TRUE, stringsAsFactors = 
 ActualData.ExpressionMatrix <- read.table(expression_file_name, header=T, row.names = 1, check.names = FALSE )
 ActualData.Cov <- read.table(covariates_file_name, header=T, row.names = 1, check.names = FALSE )
 
-#Matrix. Rows are genes. Columns are permutations
+#Initialize empty matrix for results. Rows are genes. Columns are permutations
 PermutatePvalueMatrix <- matrix(data=NA, nrow = nrow(ActualData.ExpressionMatrix), ncol = Npermutations)
 
 ### Run permutations
@@ -139,6 +139,4 @@ for (i in 1:Npermutations){
 
 row.names(PermutatePvalueMatrix) <- names(permuted$cis$min.pv.gene)
 write.table(t(PermutatePvalueMatrix), permutation_matrix_output_filename, quote=F, sep='\t', col.names = T, row.names=F)
-
-
 
