@@ -67,15 +67,9 @@ sQTL_mapping:
     # level, or gene level P-values based on a permutation test similar to gtex
     # method for eGenes.  Save best P-value for each intron phenotype after
     # each permutation of the sample labels (phenotype measurements and
-    # covariates are shuffled from the sample labels). I have saved the results
-    # of this to a file specified in the main Snakefile. In order to actually
-    # calculate the results of the permutation test, you will need to write
-    # your own script that looks at those permutation results: compare the best
-    # P-value for each phenotype to the null distribution of P-values obtained
-    # by permutations. To obtain cluster level or gene level P-values, you will
-    # have to create a script that reads in the matrix of best P-values for
-    # each intron for each permutation, then compare that to the actual best
-    # P-value for each intron, after grouping introns by cluster or gene.
+    # covariates are shuffled from the sample labels). To obtain intron level
+    # or gene level P-values from a permutation test, you will have to edit the
+    # script referenced in the "PermutationTest" rule. 
     #
     # To increase parralellization, run the permutations as many independent
     # jobs, with this many jobs and this many permutations per job. The total

@@ -9,7 +9,7 @@
 * Benjamin Fair (@bfairkun)
 
 ## Overview
-This pipeline includes read mapping (STAR), preparation of a phenotype table of splicing traits (leafcutter), and sQTL calling (MatrixEQTL calculate nominal associations, and run permutations, saving the best P-value for each intron for each permutation). You will have to make your own script to actually calculate the intron-level, cluster-level, or gene-level (one of those might make more sense than the others depending on your downstream question) P-value from the permutation results. I suppose you are interested in gene-level P-values, could always calculate intron level P-values for the permutation test and then simply ask if the minimum, but then I think it makes sense to do multiple test correction on all introns which might be overly conservative.
+This pipeline includes read mapping (STAR), preparation of a phenotype table of splicing traits (leafcutter), and sQTL calling (MatrixEQTL calculate nominal associations, and run permutations, saving the best P-value for each intron for each permutation). Then due a permutation test on a per cluster basis. Depending on your downstream analysis, you may want intron level, or gene level Pvalues. If you want those, you will have to edit the script in the pipeline that does the permutation testing.
 
 ## Usage
 
@@ -35,7 +35,7 @@ export PATH=$PATH:PathToLeacutterClonedRepo/clustering
 re-source the .bashrc:
 `source ~/.bashrc`
 
-Make sure tidyverse and MatrixEQTL are installed for R... I have been using RCC's R/3.4.3 (`module load R/3.4.3`), and installed these with `install.packages()` once in R.
+Make sure tidyverse, qvalue, stats, and MatrixEQTLlibraries are installed for R... I have been using RCC's R/3.4.3 (`module load R/3.4.3`), and installed these with `install.packages()` once in R.
 
 activate the conda environment:
 `conda activate my_Chimp_EQTL_env` 

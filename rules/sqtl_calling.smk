@@ -214,7 +214,7 @@ rule sQTL_permutations:
         covariates = "sQTL_mapping/Covariates/FromLeafcutter.PCs.{B}.covariates.txt".format(B=config["sQTL_mapping"]["IdealNumberPC"]),
         GRM = "eQTL_mapping/Kinship/GRM.cXX.txt",
     output:
-        results = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.{n}.txt",
+        results = temp("sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/Permutations/Chunk.{n}.txt"),
     params:
         InitialSeed = lambda wildcards: int(wildcards.n) * int(config["sQTL_mapping"]["PermutationChunkSize"]),
         NumberPermutations = config["sQTL_mapping"]["PermutationChunkSize"],
@@ -242,3 +242,15 @@ rule MergePermutationChunks:
         done
         """
 
+rule PermutationTesting:
+    input:
+        Permutations_MinPvaluePerTrait = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/PermutationsCombined.txt",
+        Actual_MinPvaluePerTrait = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/BestPvalueNonPermuted.txt",
+    output:
+        PermutationTestResults = "sQTL_mapping/MatrixEQTL/ConfigCovariateModelResults/PermutationTestResults.txt"
+    log:
+        "logs/sQTL_mapping/PermutationTesting.log"
+    shell:
+        """
+        Rscript scripts/PermutationTest.R {input.Permutations_MinPvaluePerTrait} {input.Actual_MinPvaluePerTrait} {output.PermutationTestResults} &> {log}
+        """

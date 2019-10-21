@@ -113,6 +113,9 @@
   "sQTL_permutations":
   {"mem" : 24000},
 
+  "PermutationTesting":
+  {"mem" : 24000},
+
   "MatrixEQTL_BestModelFromConfigFullResults":
   {"mem" : 24000}
 
