@@ -9,7 +9,7 @@
 * Benjamin Fair (@bfairkun)
 
 ## Overview
-This pipeline includes read mapping (STAR), preparation of a phenotype table of splicing traits (leafcutter), and sQTL calling (MatrixEQTL calculate nominal associations, eigenMT to obtain intron level P-values).
+This pipeline includes read mapping (STAR), preparation of a phenotype table of splicing traits (leafcutter), and sQTL calling (MatrixEQTL calculate nominal associations, and run permutations, saving the best P-value for each intron for each permutation). You will have to make your own script to actually calculate the intron-level, cluster-level, or gene-level (one of those might make more sense than the others depending on your downstream question) P-value from the permutation results. I suppose you are interested in gene-level P-values, could always calculate intron level P-values for the permutation test and then simply ask if the minimum, but then I think it makes sense to do multiple test correction on all introns which might be overly conservative.
 
 ## Usage
 
